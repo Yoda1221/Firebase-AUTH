@@ -1,0 +1,34 @@
+<%- include('html/header'); -%>
+<style>
+    .container { max-width: 500px !important; margin-top: calc((100%/2) - 25%); }
+</style>
+<title><%= title %> | Firebase Login</title>
+<div class="container">
+    <div class="row p-5 box">
+        <h5 class="text-center mb-4" id="loggedName">Hi <span><%= user.displayName %></span>!</h5>
+        <h1 class="text-center">Firebase AUTH</h1>
+        <p class="text-center mb-3 author">by Bela Fekete</p>
+        <div class="row w-100">
+            <% if( user.uid != null) { %>
+                <div class="col-md-6 text-center">
+                    <a href="logOut" class="btn">Log Out</a>
+                </div>
+                <div class="col-md-6 text-center">
+                    <a href="updateUser" class="btn">Update User</a>
+                </div>
+            <% } else { %>
+                <div class="col-md-6 text-center">
+                    <a href="login" class="btn">Log In</a>
+                </div>
+                <div class="col-md-6 text-center">
+                    <a href="registration" class="btn">Registration</a>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+    })
+</script>

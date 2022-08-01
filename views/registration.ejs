@@ -1,0 +1,115 @@
+<%- include('html/header'); -%>
+<style>
+  .container { display: grid; place-items: center; max-width: 500px; }
+</style>
+<title><%= title %> | Firebase Login</title>
+<div class="container">
+    <div class="d-flex flex-column mt-1 w-100">
+        <h2 class="text-center">Registration to <span class="appName">Firebase Login</span></h2>
+        <div class="text-center alert" role="alert" id="messages"></div>
+        <form class="w-100" action="" method="" >
+            <!-- USERNAME -->
+            <div class="form-group">
+                <label class="col-form-label col-12 pl-0" for="username">User name</label>
+                <input type="text" class="form-control mb-1" name="username" id="username" aria-describedby="usernameHelp" placeholder="pl.: Pikachu">
+                <small id="usernameHelp" class="form-text text-muted">Write an user name! (optional)</small>
+            </div>
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label class="col-form-label col-12 pl-0" for="email">e-Mail address</label>
+                <input type="email" class="form-control mb-1" id="email" aria-describedby="emailHelp" placeholder="pl.: kovacsdonci@maildrop.cc">
+                <small id="emailHelp" class="form-text text-muted">Enter the email address you want to use to register!</small>
+            </div>
+            <!-- PASSWORD -->
+            <div class="form-group">
+                <label class="col-form-label col-12 pl-0" for="password">Password</label>
+                <input type="password" class="form-control mb-1" id="password" aria-describedby="passwordHelp" placeholder="">
+                <small id="passwordHelp" class="form-text text-muted">Enter a password to register!</small>
+            </div>
+            <!-- PASSWORD CONFIRM -->
+                <div class="form-group">
+                    <label class="col-form-label col-12 pl-0" for="passwordConf">Password confirm <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control mb-1" name="passwordConf" id="passwordConf" aria-describedby="passwordConfHelp"  placeholder="">
+                    <small id="passwordConfHelp" class="form-text text-muted">Enter the password again!</small>
+                </div>
+            <!-- BUTTONS -->
+                <div class="form-group d-flex justify-content-between mt-5">
+                    <a href="home" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Back to HOME</a>
+                    <button type="submit" class="btn btn-outline-info btn-sm rounded-pill px-3" id="regBtn">Registration to the Firebse</button>
+                </div>
+        </form>
+    </div>
+</div>
+
+<script type="module">
+    import * as Services from "/js/services.js"
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const events        = ["input", "blur"]
+        const form          = document.querySelector('form')
+        const regBtn        = document.querySelector('#regBtn')
+        const messages      = document.querySelector('#messages')
+        const emailHelp     = document.querySelector('#emailHelp')
+        const passwordHelp  = document.querySelector('#passwordHelp')
+        const passConfHelp  = document.querySelector('#passwordConfHelp')
+        regBtn.disabled     = true
+        form.username.value = form.email.value = form.password.value = form.passwordConf.value = ""
+        events.forEach(e => {
+            form.email.addEventListener(e, () => { 
+                if (Services.validateEmail(form.email.value)) listenInputFields()
+                else regBtn.disabled = true
+            })
+            form.password.addEventListener(e,       () => { listenInputFields() })
+            form.passwordConf.addEventListener(e,   () => { listenInputFields() })
+        })
+     
+        function listenInputFields() {
+            Services.checkStrong(form.password.value)
+            Services.checkPasswords(form.password.value, form.passwordConf.value)
+            if (form.email.value.length > 6 && checkPasswords(form.password.value, form.passwordConf.value) ) {
+                regBtn.disabled = false
+            } else {
+                regBtn.disabled = true
+            }
+        }
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            try {
+                const res = await fetch('registration', {
+                    method: "POST",
+                    body: JSON.stringify({
+                        email:          form.email.value,
+                        displayName:    form.username.value,
+                        password:       form.password.value,
+                        passwordConf:   form.passwordConf.value,
+                    }),
+                    headers: { 'Content-Type': 'application/json'}
+                })
+                const data = await res.json()
+                if (data.errors) {
+                    if (data.errors.emailErr) {
+                        messages.textContent    = data.errors.emailErr
+                        emailHelp.textContent   = data.errors.emailErr
+                        messages.classList.add("alert-warning")
+                        messages.classList.add("mt-5 ")
+                        emailHelp.classList.remove("text-success")
+                        emailHelp.classList.remove("text-muted")
+                        emailHelp.classList.add("text-warning")
+                    }
+                    if (data.errors.password) {
+                        messages.textContent = data.errors.password
+                        passwordHelp.textContent = data.errors.password
+                        messages.classList.add("alert-warning")
+                        messages.classList.add("mt-5 ")
+                        passwordHelp.classList.remove("text-success")
+                        passwordHelp.classList.remove("text-muted")
+                        passwordHelp.classList.add("text-warning")
+                    }
+                } else { window.location.replace("home") }
+            } catch (error) {
+                console.log('Reg Submit ERROR ', error)
+            }
+        })
+    })
+</script>
+

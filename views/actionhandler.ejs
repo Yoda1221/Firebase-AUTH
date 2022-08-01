@@ -1,0 +1,172 @@
+<%- include('html/header'); -%>
+<style>
+  .container { display: grid; place-items: center; max-width: 500px; /* place-content: center; */ }
+</style>
+<title>SCN Key</title>
+    <div class="container">
+        <div class="d-flex flex-column mt-1 w-100">
+            <h1 class="text-center w-100" id="actionTitle">Action Handler</h1>
+            <div class="row">
+                <div class="mt-3 text-center alert w-100" id="messages"></div>
+            </div>
+            <form class="w-100" action="" method="" id="resetPassword">
+                <!-- PASSWORD -->
+                <div class="form-group">
+                    <label class="col-form-label col-12 pl-0" for="password">Password</label>
+                    <input id="password" class="form-control mb-1" type="password" aria-describedby="passwordHelp" placeholder="">
+                    <small id="passwordHelp" class="form-text text-muted">Write your password, with which you registered!</small>
+                </div>
+                <!-- PASSWORD CONFIRM -->
+                <div class="form-group">
+                    <label class="col-form-label col-12 pl-0" for="password">Password confirm <span class="text-danger">*</span></label>
+                    <input type="password" class="form-control mb-1" name="passwordConf" id="passwordConf" aria-describedby="passwordConfHelp"  placeholder="">
+                    <small id="passConfHelp" class="form-text text-muted">Enter the password again!</small>
+                </div>
+                <!-- BUTTONS -->
+                <div class="form-group d-flex justify-content-between mt-5">
+                    <button type="button" class="btn btn-outline-warning btn-sm rounded-pill px-3" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-info btn-sm rounded-pill px-3" id="resetPassBtn">Change password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<script>
+    const type          = JSON.parse('<%- JSON.stringify(type) %>')
+    const goto          = JSON.parse('<%- JSON.stringify(goto) %>')
+    const action        = JSON.parse('<%- JSON.stringify(action) %>')
+    const message       = JSON.parse('<%- JSON.stringify(message) %>')
+    const actionCode    = JSON.parse('<%- JSON.stringify(actionCode) %>')
+    const continueUrl   = JSON.parse('<%- JSON.stringify(continueUrl) %>')
+    document.addEventListener('DOMContentLoaded', () => {
+        const events        = ["input", "blur"]
+        const form          = document.querySelector('form')
+        const goToPage      = document.querySelector('#goToPage')
+        const messages      = document.querySelector('#messages')
+        const actionTitle   = document.querySelector('#actionTitle')
+        const passwordHelp  = document.querySelector('#passwordHelp')
+        const passConfHelp  = document.querySelector('#passConfHelp')
+        const resetPassBtn  = document.querySelector('#resetPassBtn')
+        const resetPassword = document.querySelector('#resetPassword')
+        
+        form.password.value     = ""
+        form.passwordConf.value = ""
+        messages.innerHTML      = ""
+        actionTitle.innerHTML   = ""
+        resetPassBtn.disabled   = true
+        messages.classList.remove('alert-warning')
+        messages.classList.remove('alert-success')
+        resetPassword.style.display = "none"
+
+        if (goto) {
+            if (action == "VerifyEmail") {
+                messages.classList.remove('alert-warning')
+                messages.classList.remove('alert-success')
+                messages.classList.add(`${type}` )
+                actionTitle.innerHTML   = 'Verify E-mail'
+                messages.innerHTML      = `E-mail registration is comlete. <a href="${continueUrl}" class="alert-link text-success">Go to page</a>.`
+            }
+            if (action == "ResetPassword") {
+                messages.classList.remove('alert-warning')
+                messages.classList.remove('alert-success')
+                resetPassword.style.display = "block"
+                actionTitle.innerHTML       = 'Reset Password'
+                sendResetPassForm()
+            }
+        } else {
+           //   show errors 
+        }
+        
+        function sendResetPassForm() {
+            events.forEach(ev => {
+                form.password.addEventListener(ev,      () => { listenInputFields() })
+                form.passwordConf.addEventListener(ev,  () => { listenInputFields() })
+            })
+            function listenInputFields() {
+                let strong  = checkStrong(form.password.value)
+                let equal   = checkPasswords(form.password.value, form.passwordConf.value)
+                if (strong && equal) {
+                    resetPassBtn.disabled = false
+                } else {
+                    resetPassBtn.disabled = true
+                }
+            }
+            function checkStrong(password) {
+                if (password.match(/[a-z]+/) 
+                    && password.match(/[A-Z]+/) 
+                    && password.match(/[0-9]+/) 
+                    && password.length > 7) {
+                    passwordHelp.textContent = "Pasword is correct!"
+                    passwordHelp.classList.add("text-info")
+                    passwordHelp.classList.remove("text-muted")
+                    passwordHelp.classList.remove("text-warning")
+                    return true
+                } else {
+                    resetPassBtn.disabled   = true
+                    passwordHelp.textContent = "Pasword is not correct!"
+                    passwordHelp.classList.add("text-warning")
+                    passwordHelp.classList.remove("text-muted")
+                    passwordHelp.classList.remove("text-info")
+                    return false
+                }
+            }
+            function checkPasswords(pass1, pass2) {
+                if (pass1 === pass2) {
+                    passConfHelp.textContent = "Pasword is equal!"
+                    passConfHelp.classList.add("text-info")
+                    passConfHelp.classList.remove("text-muted")
+                    passConfHelp.classList.remove("text-warning")
+                    return true
+                } else {
+                    passConfHelp.textContent = "Pasword is not equal!"
+                    passConfHelp.classList.add("text-warning")
+                    passConfHelp.classList.remove("text-muted")
+                    passConfHelp.classList.remove("text-info")
+                    return false
+                }
+            }
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault()
+                const password      = form.password.value
+                const passwordConf  = form.passwordConf.value
+            try {
+                const res = await fetch('/resetpassword', {
+                    method: "POST",
+                    body: JSON.stringify({
+                        password, passwordConf, actionCode
+                    }),
+                    headers: { 'Content-Type': 'application/json'}
+                })
+                const data = await res.json()
+                if (data.message) {
+                    messages.classList.remove('alert-warning')
+                    messages.classList.remove('alert-success')
+                    messages.classList.add(`${type}` )
+                    resetPassword.style.display = "none"
+                    messages.innerHTML      = `${data.message} <a href="${continueUrl}" class="alert-link text-success">Go to page</a>.`
+                }
+                if (data.errors) {
+                    if (data.errors.password) {
+                        passwordHelp.textContent = data.errors.password
+                        passwordHelp.classList.remove("text-success")
+                        passwordHelp.classList.remove("text-muted")
+                        passwordHelp.classList.add("text-warning")
+                    }
+                }
+            } catch (error) {
+                console.log('Reg Submit ERROR ', error)
+            }
+
+            })
+        }
+
+    }, false)
+</script>
+
+https://firlogin-d1a4f.firebaseapp.com/__/auth/action?
+mode=resetPassword
+&
+oobCode=yDVwQb1Yhl7lTzsCu8qqCJlHhlRqBAkO1hBkksb0hNYAAAGCMPazcw&apiKey=AIzaSyBmMecTGGD14lH73jLaipcZLc2YkMCi4Fc
+&
+continueUrl=http%3A%2F%2Flocalhost%3A3300%2Fapi
+&
+lang=en

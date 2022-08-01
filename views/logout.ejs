@@ -1,0 +1,16 @@
+<%- include('html/header'); -%>
+<style>
+  .container { display: grid; place-items: center; max-width: 500px; }
+</style>
+<title><%= title %> | Firebase Login</title>
+<div class="container">
+    <h2 class="text-center">You are logged out</h2>
+    
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            window.location.replace('home')
+        }, 2000)
+    })
+</script>

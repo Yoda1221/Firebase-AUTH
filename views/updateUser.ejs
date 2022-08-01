@@ -1,0 +1,105 @@
+<%- include('html/header'); -%>
+<style>
+  .container { display: grid; place-items: center; max-width: 500px; }
+</style>
+<title><%= title %> | Firebase Login</title>
+<div class="container">
+    <div class="d-flex flex-column mt-1 w-100">
+        <h2 class="text-center">Update User on <span class="appName">Firebase Login</span></h2>
+        <div class="text-center alert" role="alert" id="messages"></div>
+        <form class="w-100" action="" method="" >
+            <!-- USERNAME -->
+            <div class="form-group">
+                <label class="col-form-label col-12 pl-0" for="username">User name</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    class="form-control mb-1" 
+                    aria-describedby="usernameHelp" 
+                />
+            </div>
+            <!-- EMAIL -->
+            <div class="form-group">
+                <label class="col-form-label col-12 pl-0" for="email">e-Mail address</label>
+                <input 
+                    id="email" 
+                    type="email" 
+                    class="form-control mb-1" 
+                    aria-describedby="emailHelp" 
+                />
+                <small id="emailHelp" class="form-text text-muted">Enter the email address you want to update!</small>
+            </div>
+            <!-- BUTTONS -->
+                <div class="form-group d-flex justify-content-between mt-5">
+                    <a href="home" class="btn btn-outline-secondary btn-sm rounded-pill px-3">Back to HOME</a>
+                    <button type="submit" class="btn btn-outline-info btn-sm rounded-pill px-3" id="regBtn">Update user</button>
+                </div>
+        </form>
+    </div>
+</div>
+<script type="module">
+    import * as Services from "/js/services.js"
+
+    const uid           = JSON.parse('<%- JSON.stringify(uid) %>')
+    const email         = JSON.parse('<%- JSON.stringify(email) %>')
+    const displayName   = JSON.parse('<%- JSON.stringify(displayName) %>')
+    document.addEventListener('DOMContentLoaded', () => {
+        const events        = ["input", "blur"]
+        const form          = document.querySelector('form')
+        const regBtn        = document.querySelector('#regBtn')
+        const messages      = document.querySelector('#messages')
+        const emailHelp     = document.querySelector('#emailHelp')
+        regBtn.disabled     = true
+        form.username.value = displayName
+        form.email.value    = email
+        events.forEach( e => { 
+            form.email.addEventListener(e, () => { 
+                if (Services.validateEmail(form.email.value)) listenInputFields()
+                else regBtn.disabled = true
+            })
+        })
+        function listenInputFields() {
+            if (form.email.value.length > 6) {
+                regBtn.disabled = false
+            } else {
+                regBtn.disabled = true
+            }
+        }
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault()
+            try {
+                const res = await fetch('updateUser', {
+                    method: "PUT",
+                    body: JSON.stringify({
+                        uid,
+                        email:          form.email.value,
+                        displayName:    form.username.value
+                    }),
+                    headers: { 'Content-Type': 'application/json'}
+                })
+                const data = await res.json()
+                if (data.errors) {
+                    if (data.errors.emailErr) {
+                        messages.textContent    = data.errors.emailErr
+                        emailHelp.textContent   = data.errors.emailErr
+                        messages.classList.add("alert-warning")
+                        messages.classList.add("mt-5 ")
+                        emailHelp.classList.remove("text-success")
+                        emailHelp.classList.remove("text-muted")
+                        emailHelp.classList.add("text-warning")
+                    }
+                } else {
+                    messages.classList.add(data.type)
+                    messages.textContent = data.message + ' ' + data.userRecord.displayName
+                    setTimeout(() => {
+                        messages.classList.remove(data.type)
+                        messages.textContent = ""
+                        window.location.replace("home") 
+                    }, 3000)
+                }
+            } catch (error) {
+                console.log('Reg Submit ERROR ', error)
+            }
+        })
+    })
+</script>
