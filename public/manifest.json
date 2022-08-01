@@ -1,22 +1,21 @@
 {
-    "name": "Firebase AUTH",
-    "short_name": "Firebase AUTH",
-    "icons": [
-      { 
-        "src": "../img/logo_192.png", 
+  "name": "Firebase AUTH",
+  "short_name": "Firebase AUTH",
+  "icons": [
+    { 
+      "src": "../img/logo_192.png", 
+      "type": "image/png", 
+      "sizes": "192x192" 
+    },
+    { 
+        "src": "/logo_512.png", 
         "type": "image/png", 
-        "sizes": "192x192" 
-      },
-      { 
-          "src": "/logo_512.png", 
-          "type": "image/png", 
-          "sizes": "512x512" 
-      }
-    ],
-    "start_url": ".",
-    "theme_color": "#411530",
-    "background_color": "#411530",
-    "display": "standalone"
-  }
-  
+        "sizes": "512x512" 
+    }
+  ],
+  "start_url": ".",
+  "theme_color": "#411530",
+  "background_color": "#411530",
+  "display": "standalone"
+}
   

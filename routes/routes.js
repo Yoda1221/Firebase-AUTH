@@ -7,7 +7,6 @@ const {
 
 const authController = require('../controllers/AuthController')
 
-
 router.route('/home').get(checkLoggedUser, authController.home)
 router.route('/logOut').get(requireAuth, authController.logOut)
 router.route('/login').get(authController.login).post(authController.loginP)
