@@ -9,11 +9,6 @@ require('dotenv').config()
 const corsOptions   = require('./services/corsOptions')
 const ErrorHandler  = require('./middleware/ErrorHandler')
 const { logEvents, logger } = require('./middleware/LogEvents')
-/* const EventEmitter  = require('events')
-class Emitter extends EventEmitter { }
-const myEmitter     = new Emitter()
-myEmitter.on('log', (msg, fileName) => logEvents(msg, fileName)); */
-
 
 //* MMIDDLEWARE'S
 app.use(logger)
@@ -25,6 +20,7 @@ app.use(express.urlencoded({extended: false}))
 app.use(express.static(path.join(__dirname, '/public')))
 
 app.use('/api', require('./routes/routes'))
+
 app.all('*', (req, res) => {
     res.status(404)
     if (req.accepts('html')) res.sendFile(path.join(__dirname, 'views', '404.html'))
