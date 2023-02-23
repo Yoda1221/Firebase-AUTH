@@ -196,3 +196,8 @@
 06-08-2022 21:27:07	94855d94-3d08-4971-bc21-6e9d24237217	GET	undefined	/img/favicon.ico
 06-08-2022 21:27:07	69187f83-55f6-4cd3-9679-471b5fb21c7f	GET	undefined	/manifest.json
 06-08-2022 21:27:07	6120a8ef-6ef8-432a-a28d-089f8c2dc3f0	GET	undefined	/img/logo_192.png
+12-08-2022 22:58:42	9ccf5038-3686-437a-b11e-c8f89d883749	GET	undefined	/css/style.css
+12-08-2022 22:58:43	748c4a29-2928-4891-b593-71643d9945a2	GET	undefined	/img/favicon.ico
+12-08-2022 22:58:43	873450e3-2bb1-4f50-9bba-672658cd326a	GET	undefined	/manifest.json
+12-08-2022 22:58:43	4552b834-5230-4254-9578-e24a8d512c1e	GET	undefined	/img/logo_192.png
+12-08-2022 22:58:43	5205fdab-fe6e-4bc9-ac01-accd1582da49	GET	undefined	/img/favicon-32x32.png
